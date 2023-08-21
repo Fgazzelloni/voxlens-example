@@ -1,10 +1,23 @@
 import * as d3 from 'd3';
 import max from 'lodash/max';
 import orderBy from 'lodash/orderBy';
+import voxlens from 'voxlens';
 
 const data = orderBy(require('./data.json'), ['state'], ['asc']);
 
 const createD3 = () => {
+  const voxlensOptions = {
+    x: 'state',
+    y: 'cases',
+    title: 'COVID-19 Cases per US State',
+    chartType: 'bar',
+    feedbackCollector: {
+      scales: 5,
+      email: 'ather@cs.washington.edu'
+    },
+    debug: true,
+  };
+
   const getDimensions = (maxXLabel) => {
     const margin = { top: 20, right: 40, bottom: maxXLabel * 5 + 10, left: 70 };
 
@@ -46,7 +59,8 @@ const createD3 = () => {
     .attr('x', (d) => x(d['state']))
     .attr('width', x.bandwidth())
     .attr('y', (d) => y(d['cases']))
-    .attr('height', (d) => height - y(d['cases']));
+    .attr('height', (d) => height - y(d['cases']))
+    .call((d) => voxlens('d3', d, data, voxlensOptions));
 
   svg
     .append('text')
